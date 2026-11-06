@@ -1,107 +1,73 @@
-# Dashboard de Criptomonedas
+# 📈 Dashboard de Criptomonedas (PHP + API REST)
 
-Aplicación web sencilla desarrollada en PHP cuyo propósito es conectarse mediante `cURL` a una API externa de criptomonedas y mostrar los precios actuales de varias monedas en dólares estadounidenses (USD) y euros (EUR).
+![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![cURL](https://img.shields.io/badge/cURL-073551?style=for-the-badge&logo=curl&logoColor=white)
+![CoinGecko](https://img.shields.io/badge/API-CoinGecko-8DC63F?style=for-the-badge)
 
-El proyecto utiliza la API pública de [CoinGecko](https://www.coingecko.com/) para obtener los datos y muestra gráficos interactivos de Bitcoin y Solana mediante widgets de [TradingView](https://www.tradingview.com/).
+Página hecha en **PHP** que consulta una **API REST externa** con cURL y muestra el precio actual de varias criptomonedas en dólares y euros, junto a gráficos en tiempo real.
 
-## Características
+## 💡 Por qué lo hice
 
-- Consulta de precios en tiempo real desde CoinGecko.
-- Conversión de la respuesta JSON a un array asociativo de PHP.
-- Visualización de precios en USD y EUR.
-- Criptomonedas consultadas:
-  - Bitcoin (BTC)
-  - Ethereum (ETH)
-  - Solana (SOL)
-  - Sui (SUI)
-  - Dogecoin (DOGE)
-  - Cardano (ADA)
-- Mensaje de error cuando la API no responde con HTTP 200.
-- Actualización automática de la página cada 3 minutos para reducir el riesgo de alcanzar el límite de peticiones de la API.
-- Gráficos interactivos de los pares `BINANCE:BTCUSD` y `BINANCE:SOLUSD`.
-- Diseño adaptable con HTML y CSS integrados en el archivo PHP.
+Es un proyecto personal, fuera de clase. Quería aprender a **integrar una API de terceros** en una aplicación: hacer la petición HTTP, comprobar la respuesta, convertir el JSON y pintar los datos. Elegí la API pública de **CoinGecko** porque es gratuita, no pide registro y la usan muchas plataformas de criptomonedas.
 
-## Tecnologías utilizadas
+## ✨ Funcionalidades
 
-- PHP
-- cURL
-- HTML5
-- CSS3
-- JSON
-- API REST de CoinGecko
-- Widget JavaScript de TradingView
+- Precio actual de **Bitcoin, Ethereum, Solana, Sui, Dogecoin y Cardano** en **USD** y **EUR**.
+- Gráficos interactivos de BTC/USD y SOL/USD con widgets de **TradingView**.
+- **Gestión de errores:** si la API no responde con `HTTP 200`, se muestra un mensaje con el código recibido en lugar de romper la página.
+- Recarga automática cada **3 minutos** para no superar el límite de peticiones de la API (error `429 Too Many Requests`).
+- Diseño adaptable a móvil.
 
-## Estructura del proyecto
+## 🧠 Lo que aprendí
 
-```text
-api_cripto/
-├── api_cripto.php   # Código de la aplicación y la interfaz visual
-└── README.md        # Documentación del proyecto
+- Hacer peticiones HTTP desde el servidor con **cURL** (`curl_init`, `curl_setopt`, `curl_exec`).
+- Leer el **código de estado HTTP** (`curl_getinfo`) antes de usar la respuesta.
+- Convertir JSON en arrays asociativos de PHP con `json_decode($response, true)`.
+- Dar formato a los números con `number_format()`.
+- Que las APIs gratuitas tienen **rate limit**, y cómo diseñar la página para respetarlo.
+
+## ⚙️ Cómo funciona
+
+```
+Navegador ──► api_cripto.php ──cURL──► API CoinGecko
+                    │                       │
+                    ◄────── JSON ───────────┘
+                    │
+             json_decode() → tarjetas HTML con los precios
 ```
 
-## Requisitos
+Endpoint utilizado:
 
-- PHP 7.4 o superior.
-- Extensión `cURL` habilitada en PHP.
-- Conexión a Internet.
-- Navegador web actualizado.
-
-No es necesario instalar dependencias mediante Composer o npm.
-
-## Instalación y ejecución
-
-1. Clona o descarga el proyecto.
-2. Comprueba que la extensión cURL esté habilitada:
-
-   ```bash
-   php -m | grep curl
-   ```
-
-3. Desde la carpeta del proyecto, inicia el servidor integrado de PHP:
-
-   ```bash
-   php -S localhost:8000
-   ```
-
-4. Abre la siguiente dirección en el navegador:
-
-   ```text
-   http://localhost:8000/api_cripto.php
-   ```
-
-También puede ejecutarse colocando la carpeta dentro de un servidor web compatible con PHP, como Apache o Nginx con PHP configurado.
-
-## Funcionamiento
-
-1. El archivo define la URL de la API de CoinGecko con las monedas y divisas solicitadas.
-2. Se inicializa una sesión de `cURL` y se configura para devolver la respuesta como texto.
-3. Se realiza la petición HTTP y se obtiene el código de estado.
-4. Si la respuesta es correcta, se interpreta el JSON mediante `json_decode()`.
-5. Los precios disponibles se muestran en tarjetas individuales.
-6. Si existe un error de conexión o la API devuelve otro código HTTP, se muestra un mensaje indicando el código recibido.
-7. TradingView carga los gráficos de Bitcoin y Solana desde su script externo.
-
-## Endpoint utilizado
-
-```text
-https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,sui,dogecoin,cardano&vs_currencies=usd,eur
+```
+GET https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,sui,dogecoin,cardano&vs_currencies=usd,eur
 ```
 
-La API devuelve una estructura similar a esta:
+Respuesta (ejemplo):
 
 ```json
-{
-  "bitcoin": {
-    "usd": 65000,
-    "eur": 60000
-  }
-}
+{ "bitcoin": { "usd": 65000, "eur": 60000 } }
 ```
 
-Los valores reales cambian según la cotización del mercado en el momento de la consulta.
+## 🚀 Ejecutarlo en local
 
-## Consideraciones
+Requisitos: PHP 7.4 o superior con la extensión cURL activada.
 
-- La disponibilidad y el límite de peticiones dependen de CoinGecko.
-- TradingView se carga desde un recurso externo, por lo que los gráficos requieren conexión a Internet.
-- Este proyecto tiene fines educativos y de demostración. Los precios mostrados no deben utilizarse como asesoramiento financiero.
+```bash
+git clone https://github.com/robertbrito1/api_cripto.git
+cd api_cripto
+php -S localhost:8000
+```
+
+Abre `http://localhost:8000/api_cripto.php`.
+
+## 🔜 Próximas mejoras
+
+- [ ] Rehacerlo con **Next.js**: obtener los datos en el servidor con caché (`revalidate`) en lugar de recargar la página.
+- [ ] Generar las tarjetas con un bucle en lugar de repetir el HTML de cada moneda.
+- [ ] Separar la lógica (petición a la API) de la vista (HTML/CSS).
+
+> Proyecto con fines educativos. Los precios no son asesoramiento financiero.
+
+## 👤 Autor
+
+**Robert Brito** · [GitHub](https://github.com/robertbrito1) · [LinkedIn](https://www.linkedin.com/in/robertbrito/)
